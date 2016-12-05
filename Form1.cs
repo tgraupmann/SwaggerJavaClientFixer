@@ -243,6 +243,10 @@ namespace SwaggerJavaClientFixer
                     const string TOKEN_BUFFERED_SOURCE = "public BufferedSource source() {";
                     const string TOKEN_OLD_BUFFERED_SOURCE = "public BufferedSource source() throws IOException {";
 
+                    // JSON.java
+                    const string TOKEN_PARSE_DATE = "DateTime.parse(date, ISODateTimeFormat.dateTimeParser())";
+                    const string TOKEN_OLD_PARSE_DATE = "formatter.parseDateTime(date)";
+
                     // ref: http://stackoverflow.com/questions/34895397/not-able-to-import-com-squareup-okhttp-okhttpclient
                     // add lib: http://stackoverflow.com/questions/28465603/error-package-javax-annotation-does-not-exist-after-upgrade-to-lombok-1-16-2
                     // add lib: http://stackoverflow.com/questions/29237563/adding-joda-time-to-android-studio
@@ -253,28 +257,6 @@ namespace SwaggerJavaClientFixer
                     // MultipartBuilder into MultipartBody, MultipartBody.Part, and MultipartBody.Builder.
 
                     // ref: http://stackoverflow.com/questions/34930167/upload-dynamic-number-of-files-with-okhttp3
-
-                    /*
-                     * //httpClient.setConnectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-                     * httpClient.newBuilder().connectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-                     * 
-                     * //httpClient.setSslSocketFactory(sslContext.getSocketFactory());
-                     * httpClient.newBuilder().sslSocketFactory(sslContext.getSocketFactory());
-                     * 
-                     * //httpClient.setSslSocketFactory(null);
-                     * httpClient.newBuilder().sslSocketFactory(null);
-                     *
-                     * //httpClient.setHostnameVerifier(hostnameVerifier);
-                     * httpClient.newBuilder().hostnameVerifier(hostnameVerifier);
-                     *
-                     * //public long contentLength() { //throws IOException {
-                     * public long contentLength() //throws IOException {
-                     * 
-                     * //public BufferedSource source() throws IOException {
-                     * public BufferedSource source() { //throws IOException {
-                     *
-                     */
-
 
                     // upgrade to okhttp3
                     if (null != line)
@@ -358,7 +340,9 @@ namespace SwaggerJavaClientFixer
                             line.Contains(TOKEN_OLD_SET_SSL) ||
                             line.Contains(TOKEN_OLD_SET_HOSTNAME_VERIFIER) ||
                             line.Contains(TOKEN_OLD_CONTENT_LENGTH) ||
-                            line.Contains(TOKEN_OLD_BUFFERED_SOURCE)))
+                            line.Contains(TOKEN_OLD_BUFFERED_SOURCE) ||
+                            line.Contains(TOKEN_OLD_PARSE_DATE)
+                            ))
                         {
                             replaceLine =
                                 line.Replace(TOKEN_OLD_NAMESPACE_CALL, TOKEN_NAMESPACE_CALL).
@@ -386,9 +370,19 @@ namespace SwaggerJavaClientFixer
                                         Replace(TOKEN_OLD_BUFFERED_SOURCE, TOKEN_BUFFERED_SOURCE);
                                 }
                             }
+                            if (fileInfo.Name.Equals("JSON.java"))
+                            {
+                                if (null == replaceLine)
+                                {
+                                    replaceLine = line.Replace(TOKEN_OLD_PARSE_DATE, TOKEN_PARSE_DATE);
+                                }
+                                else
+                                {
+                                    replaceLine = replaceLine.Replace(TOKEN_OLD_PARSE_DATE, TOKEN_PARSE_DATE);
+                                }
+                            }
                             replaceLine = replaceLine + Environment.NewLine;
                         }
-
                     }
 
                     if (null != replaceLine)
